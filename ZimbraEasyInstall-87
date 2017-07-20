@@ -234,7 +234,6 @@ if [[ `lsb_release -rs` == "14.04" ]]; then
     echo "You can access now to your Zimbra Collaboration Server"
     echo "Admin Console: https://"$2":7071"
     echo "Web Client: https://"$2
-    fi
 fi
 su - zimbra -c 'zmcontrol restart'
 echo "You can access now to your Zimbra Collaboration Server"
