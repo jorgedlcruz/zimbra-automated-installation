@@ -5,6 +5,9 @@ RANDOMSPAM=$(date +%s|sha256sum|base64|head -c 10)
 RANDOMVIRUS=$(date +%s|sha256sum|base64|head -c 10)
 HOSTNAME=$(hostname -s)
 
+#Installing dependencies
+yum install -y perl net-tools nc
+
 #Disable postfix service
 systemctl disable postfix
 systemctl stop postfix
