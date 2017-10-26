@@ -231,7 +231,7 @@ y
 y
 EOF
 if [[ `rpm -qa '(oraclelinux|sl|redhat|centos)-release(|-server)'|cut -d"." -f3` == "el7" ]]; then
-    echo "Downloading Zimbra Collaboration 8.7.11 for Ubuntu 16.04"
+    echo "Downloading Zimbra Collaboration 8.7.11 for CentOS/RedHat 7"
     curl -O -L https://files.zimbra.com/downloads/8.7.11_GA/zcs-8.7.11_GA_1854.RHEL7_64.20170531151956.tgz
     tar xzvf zcs-*
     echo "Installing Zimbra Collaboration just the Software"
