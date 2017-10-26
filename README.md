@@ -45,6 +45,9 @@ The Script will take care of everything and after a few minutes you can go to th
 ## ToDo
 - [ ] Prepare and configure automatically the Reverse DNS Zone
 - [ ] Make it multi-platform to use it in CentOS/RedHat, Suse and Ubuntu 12.04
+- - [x] CentOS/RedHat, Suse and Ubuntu 12.04
+- - [ ] Suse
+- - [ ] Ubuntu 12.04
 - [ ] Make it Multi-Server, to install in each server only the rol that selects (LDAP, Mailbox, MTA, PROXY, UI)
 - [x] Have the option to select Bind, dnsmasq, or external DNS
 - [ ] Have the option to select the Timezone, the default one is Los Angeles
