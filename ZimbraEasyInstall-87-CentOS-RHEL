@@ -5,40 +5,64 @@ RANDOMSPAM=$(date +%s|sha256sum|base64|head -c 10)
 RANDOMVIRUS=$(date +%s|sha256sum|base64|head -c 10)
 HOSTNAME=$(hostname -s)
 
+#Installing dependencies
+yum install -y perl net-tools nc
+
+#Disable postfix service
+systemctl disable postfix
+systemctl stop postfix
+
 #Install a DNS Server
 if [ "$4" == "bind" ]; then
-    sudo apt-get update && sudo apt-get install -y bind9 bind9utils bind9-doc
+    yum update -y && yum install -y bind bind-utils
     echo "Installing Bind DNS Server"
-    sed "s/-u/-4 -u/g" /etc/default/bind9 > /etc/default/bind9.new
-    mv /etc/default/bind9.new /etc/default/bind9
-    rm /etc/bind/named.conf.options
-cat <<EOF >>/etc/bind/named.conf.options
+    mv /etc/named.conf /etc/named.conf.original
+cat <<EOF >>/etc/named.conf
 options {
-directory "/var/cache/bind";
+        listen-on port 53 { 127.0.0.1; $2; };
+        directory       "/var/named";
+        dump-file       "/var/named/data/cache_dump.db";
+        statistics-file "/var/named/data/named_stats.txt";
+        memstatistics-file "/var/named/data/named_mem_stats.txt";
+        allow-query     { localhost; $2; };
+        recursion yes;
+        dnssec-enable yes;
+        dnssec-validation yes;
+        bindkeys-file "/etc/named.iscdlv.key";
+        managed-keys-directory "/var/named/dynamic";
+        pid-file "/run/named/named.pid";
+        session-keyfile "/run/named/session.key";
+        allow-transfer { none; }; # disable zone transfers by default
 
-listen-on { $2; }; # ns1 private IP address - listen on private network only
-allow-transfer { none; }; # disable zone transfers by default
-
-forwarders {
-8.8.8.8;
-8.8.4.4;
+        forwarders {
+            8.8.8.8;
+            8.8.4.4;
+        };
+        auth-nxdomain no; # conform to RFC1035
 };
-auth-nxdomain no; # conform to RFC1035
-#listen-on-v6 { any; };
-
+logging {
+        channel default_debug {
+                file "data/named.run";
+                severity dynamic;
+        };
 };
-EOF
-cat <<EOF >>/etc/bind/named.conf.local
-zone "$1" {
+zone "." IN {
+        type hint;
+        file "named.ca";
+};
+zone "$1" IN {
         type master;
-        file "/etc/bind/db.$1";
+        file "$1.zone";
 };
+include "/etc/named.rfc1912.zones";
+include "/etc/named.root.key";
 EOF
-touch /etc/bind/db.$1
-cat <<EOF >/etc/bind/db.$1
+touch /var/named/$1.zone
+SERIAL=$(date +%Y%m%d2)
+cat <<EOF >/var/named/$1.zone
 \$TTL  604800
 @      IN      SOA    ns1.$1. root.localhost. (
-                                2        ; Serial
+                                ${SERIAL}        ; Serial
                         604800        ; Refresh
                         86400        ; Retry
                         2419200        ; Expire
@@ -55,13 +79,13 @@ cat <<EOF >/etc/bind/db.$1
     imap4     IN      A      $2
     smtp     IN      A      $2
 EOF
-    sudo service bind9 restart
+    systemctl enable named && systemctl start named
 fi
 if [ "$4" == "dnsmasq" ]; then
     echo "Installing dnsmasq DNS Server"
-    sudo apt-get update && sudo sudo apt-get install -y dnsmasq
+    yum update -y && yum install -y dnsmasq
     echo "Configuring DNS Server"
-    mv /etc/dnsmasq.conf /etc/dnsmasq.conf.old
+    mv /etc/dnsmasq.conf /etc/dnsmasq.conf.original
 cat <<EOF >>/etc/dnsmasq.conf
 server=8.8.8.8
 listen-address=127.0.0.1
@@ -69,12 +93,12 @@ domain=$1
 mx-host=$1,$HOSTNAME.$1,0
 address=/$HOSTNAME.$1/$2
 EOF
-    sudo service dnsmasq restart
+    systemctl enable dnsmasq && systemctl start dnsmasq
 else
     echo "Installing dnsmasq DNS Server"
-    sudo apt-get update && sudo sudo apt-get install -y dnsmasq
+    yum update -y && yum install -y dnsmasq
     echo "Configuring DNS Server"
-    mv /etc/dnsmasq.conf /etc/dnsmasq.conf.old
+    mv /etc/dnsmasq.conf /etc/dnsmasq.conf.original
 cat <<EOF >>/etc/dnsmasq.conf
 server=8.8.8.8
 listen-address=127.0.0.1
@@ -82,7 +106,7 @@ domain=$1
 mx-host=$1,$HOSTNAME.$1,0
 address=/$HOSTNAME.$1/$2
 EOF
-    sudo service dnsmasq restart
+    systemctl enable dnsmasq && systemctl start dnsmasq
 fi
 ##Preparing the config files to inject
     echo "Creating the Scripts files"
@@ -209,22 +233,9 @@ y
 y
 y
 EOF
-if [[ `lsb_release -rs` == "16.04" ]]; then
-    echo "Downloading Zimbra Collaboration 8.7.11 for Ubuntu 16.04"
-    wget https://files.zimbra.com/downloads/8.7.11_GA/zcs-8.7.11_GA_1854.UBUNTU16_64.20170531151956.tgz
-    tar xzvf zcs-*
-    echo "Installing Zimbra Collaboration just the Software"
-    cd /tmp/zcs/zcs-* && ./install.sh -s < /tmp/zcs/installZimbra-keystrokes
-    echo "Installing Zimbra Collaboration injecting the configuration"
-    /opt/zimbra/libexec/zmsetup.pl -c /tmp/zcs/installZimbraScript
-    su - zimbra -c 'zmcontrol restart'
-    echo "You can access now to your Zimbra Collaboration Server"
-    echo "Admin Console: https://"$2":7071"
-    echo "Web Client: https://"$2
-fi
-if [[ `lsb_release -rs` == "14.04" ]]; then
-    echo "Downloading Zimbra Collaboration 8.7.11 for Ubuntu 14.04"
-    wget https://files.zimbra.com/downloads/8.7.11_GA/zcs-8.7.11_GA_1854.UBUNTU14_64.20170531151956.tgz
+if [[ `rpm -qa '(oraclelinux|sl|redhat|centos)-release(|-server)'|cut -d"." -f3` == "el7" ]]; then
+    echo "Downloading Zimbra Collaboration 8.7.11 for CentOS/RedHat 7"
+    curl -O -L https://files.zimbra.com/downloads/8.7.11_GA/zcs-8.7.11_GA_1854.RHEL7_64.20170531151956.tgz
     tar xzvf zcs-*
     echo "Installing Zimbra Collaboration just the Software"
     cd /tmp/zcs/zcs-* && ./install.sh -s < /tmp/zcs/installZimbra-keystrokes
