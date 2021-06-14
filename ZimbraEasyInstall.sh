@@ -290,17 +290,17 @@ Server_OS_Version=$(grep VERSION_ID /etc/os-release | awk -F[=,] '{print $2}' | 
 
 
 Check_Conflicting_Services() {
-	services_to_disable=$("postfix" "iptables" "httpd" "exim" "named" "apache2" "sendmail" "mysqld" "mariadb" "systemd-resolved")
+services_to_disable=$("postfix" "iptables" "httpd" "exim" "named" "apache2" "sendmail" "mysqld" "mariadb" "systemd-resolved")
 
-	for service in "${services_to_disable[@]}"
-	do
-		if systemctl is-active --quiet "${service}"; then
-			systemctl disable "${service}"
-			systemctl stop "${service}"
-			systemctl mask "${service}"
-			echo -e "\n${service} process detected, disabling...\n"
-		fi
-	done
+for service in "${services_to_disable[@]}"
+do
+	if systemctl is-active --quiet "${service}"; then
+		systemctl disable "${service}"
+		systemctl stop "${service}"
+		systemctl mask "${service}"
+		echo -e "\n${service} process detected, disabling...\n"
+	fi
+done
 }
 
 Pre_Install_Required_Components() {
@@ -606,7 +606,7 @@ Generate_Installer_Script_INPUT(){
 
 INSTALL_ZIMBRA(){
 	latestLTSZimbra=$(curl -s https://wiki.zimbra.com/wiki/Zimbra_Releases | grep -E "LTS Release"|grep -oE "[[:digit:]]+.[[:digit:]]+.[[:digit:]]+"| head -n1);
-	zimbra_url=$(curl -s https://www.zimbra.org/download/zimbra-collaboration | grep "${Server_OS}" | grep  |grep ${latestLTSZimbra} |grep 64bitx86 | tail -n1|grep -Eo '(http|https)://[a-zA-Z0-9./?=_-]*.tgz'|uniq);
+	zimbra_url=$(curl -s https://www.zimbra.org/download/zimbra-collaboration | grep "${Server_OS^^}" | grep "${Server_OS_Version}" |grep ${latestLTSZimbra} |grep 64bitx86 | tail -n1|grep -Eo '(http|https)://[a-zA-Z0-9./?=_-]*.tgz'|uniq);
 	echo "Downloading Zimbra release ${zimbra_url}....."
 	wget "${zimbra_url}" ;
 	filename=$(basename "$zimbra_url");
