@@ -329,48 +329,42 @@ fi
 }
 
 Install_LetsEncrypt(){
-if [[ "$Server_OS" = "CentOS" ]] ; then
-	if [[ "$Server_OS_Version" = "7" ]] ; then
-    	yum install -y certbot
-  	elif [[ "$Server_OS_Version" = "8" ]] ; then
-    	dnf install -y certbot
-  	fi
-else
-  DEBIAN_FRONTEND=noninteractive apt upgrade -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold"
+	echo 'Installing certbot for OS'
+	if [[ "$Server_OS" = "CentOS" ]] ; then
+		if [[ "$Server_OS_Version" = "7" ]] ; then
+			yum install -y certbot
+		elif [[ "$Server_OS_Version" = "8" ]] ; then
+			dnf install -y certbot
+		fi
+	else
+	DEBIAN_FRONTEND=noninteractive apt upgrade -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold"
 
-  # Certbot requirements
-  DEBIAN_FRONTEND=noninteractive apt install software-properties-common -y
-  DEBIAN_FRONTEND=noninteractive add-apt-repository universe  -y
-  DEBIAN_FRONTEND=noninteractive add-apt-repository ppa:certbot/certbot  -y
-  DEBIAN_FRONTEND=noninteractive apt update -y
-  DEBIAN_FRONTEND=noninteractive apt install certbot -y
+	# Certbot requirements
+	DEBIAN_FRONTEND=noninteractive apt install software-properties-common -y
+	DEBIAN_FRONTEND=noninteractive add-apt-repository universe -y
+	DEBIAN_FRONTEND=noninteractive add-apt-repository ppa:certbot/certbot -y
+	DEBIAN_FRONTEND=noninteractive apt update -y
+	DEBIAN_FRONTEND=noninteractive apt install certbot -y
 
-fi
+	fi
+}
 
-# Setup Let's Encrypt via : https://github.com/YetOpen/certbot-zimbra
-wget -O /usr/local/bin/certbot_zimbra.sh https://github.com/YetOpen/certbot-zimbra/raw/master/certbot_zimbra.sh;
-chmod +x /usr/local/bin/certbot_zimbra.sh;
-echo 'Setting up certbot-zimbra from: https://github.com/YetOpen/certbot-zimbra'
-touch /etc/cron.d/zimbracrontab
-chmod +x /etc/cron.d/zimbracrontab
-cat >> /etc/cron.d/zimbracrontab <<-EOL
-# certbot_zimbra.sh requires bash and a path with /usr/sbin
-SHELL=/bin/bash
-PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+INSTALL_CERTBOT_ZIMBRA(){
+	echo 'Installling certbot-zimbra to /usr/local/bin/certbot'
+	wget -O /usr/local/bin/certbot_zimbra.sh https://github.com/YetOpen/certbot-zimbra/raw/master/certbot_zimbra.sh;
+	chmod +x /usr/local/bin/certbot_zimbra.sh;
+	echo 'Installling crontab file for automated renewals to /etc/cron.d/zimbracrontab'
+	wget -O /etc/cron.d/zimbracrontab https://github.com/whattheserver/certbot-zimbra/raw/masterzimbracrontab;
+	chmod +x /etc/cron.d/zimbracrontab
 
-# Replace /usr/bin/certbot with the location of your certbot binary, use this to find it: which certbot-auto certbot letsencrypt
-12 5 * * * root /usr/bin/certbot renew --pre-hook "/usr/local/bin/certbot_zimbra.sh -p" --deploy-hook "/usr/local/bin/certbot_zimbra.sh -d"
-EOL
-
-# Disable automatically created Certbot cron schedules and a systemd timers to renew certificates.
-# We must disable this schedule because after the renew we must deploy it in Zimbra.
-# Also certbot's timers will attempt to update the cert twice a day, this means a Zimbra restart may happen during work hours.
-# So open /etc/cron.d/certbot with your favourite editor and comment the last line.
-sed -i '/certbot -q renew/s/^/#/g' /etc/cron.d/certbot
-systemctl stop certbot.timer && systemctl disable certbot.timer
-echo 'Running certbot_zimbra initialization script. See details here: https://github.com/YetOpen/certbot-zimbra#first-run'
-/usr/local/bin/certbot_zimbra.sh -n -c
-
+	echo 'Disabling automatically created Certbot cron schedules and systemd timers from renewing certificates.'
+	sed -i '/certbot -q renew/s/^/#/g' /etc/cron.d/certbot
+	systemctl stop certbot.timer && systemctl disable certbot.timer
+	echo 'Installation complete..'
+	echo 'Starting certbot-auto bootstrap:'
+	certbot-auto
+	echo 'Running installed certbot_zimbra initialization script. See details here: https://github.com/YetOpen/certbot-zimbra#first-run and walk through first run as advised.'
+	/usr/local/bin/certbot_zimbra.sh -n -c
 }
 
 DISABLE_SYSTEMD_RESOLVER(){
@@ -754,7 +748,9 @@ if [[ "$_arg_csf" = "on" ]] ; then
 fi
 
 if [[ "$_arg_certbot_zimbra" = "on" ]] ; then
-	Install_LetsEncrypt
+	if Install_LetsEncrypt ; then
+		INSTALL_CERTBOT_ZIMBRA
+	fi
 fi
 
 
