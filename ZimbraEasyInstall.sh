@@ -595,6 +595,31 @@ Generate_Installer_Script_INPUT(){
 	EOL
 
 
+	cat >> Zimbra8.8.15_keystrokes=<<- 'EOL' 
+	Do you agree with the terms of the software license agreement? [N]
+	Use Zimbra's package repository [Y]
+	Install zimbra-ldap [Y] Y
+	Install zimbra-logger [Y]
+	Install zimbra-mta [Y] Y
+	Install zimbra-dnscache [Y]
+	Install zimbra-snmp [Y]
+	Install zimbra-store [Y]
+	Install zimbra-apache [Y]
+	Install zimbra-spell [Y]
+	Install zimbra-memcached [Y]
+	Install zimbra-proxy [Y]
+	Install zimbra-drive [Y]
+	Install zimbra-imapd (BETA - for evaluation only) [N]
+	Install zimbra-chat [Y]
+	The system will be modified.  Continue? [N]
+	EOL
+	
+	
+	# this can be reverse engineered by running through the installer where the license wizard pops up and counting how many prompts there are. 
+	# Whenever they add or remove one the amount of ordering off which breaks the automation. See above for latest version prompts.
+	# Normally would just do a `printf '\n' |./install.sh  but they have the license agreements with a default of N
+	# Possible alternatives would be to just change the conflicting defaults to desired ones if thats easier then trying to guess how many arguments and the order or neutralize the unecessary functions triggering the prompts during install.
+	# sed 's|"Do you agree with the terms of the software license agreement?" "N"|"Do you agree with the terms of the software license agreement?" "Y"|g' 
 	touch /tmp/zcs/installZimbra-keystrokes
 	cat >> /tmp/zcs/installZimbra-keystrokes <<- 'EOL'
 	y
@@ -612,7 +637,7 @@ Generate_Installer_Script_INPUT(){
 	y
 	n
 	y
-    y
+	y
 	EOL
 }
 
