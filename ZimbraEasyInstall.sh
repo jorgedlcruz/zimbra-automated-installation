@@ -6,16 +6,15 @@
 # ./ZimbraEasyInstall.sh domain 
 #./ZimbraEasyInstall.sh zimbra.io --ip 192.168.211.40 --password Zimbra2017 
 #
-## link='https://github.com/whattheserver/zimbra-automated-installation/raw/master/ZimbraEasyInstall.sh'; bash <(curl -s ${link} || wget -qO - ${link}) zimbra.io --ip 192.168.211.40 --password Zimbra2017 
+## link='https://raw.githubusercontent.com/whattheserver/zimbra-automated-installation/master/ZimbraEasyInstall.sh'; bash <(curl -s ${link} || wget -qO - ${link}) zimbra.io --ip 192.168.211.40 --password Zimbra2017 
 ##
 
 
-if [ "${DEBUG}" == 'True' ] || [ "${DEBUG}" == 1 ]; then
+if [ "${DEBUG}" == 'True' ] ||[ "${DEBUG}" == 'true' ]|| [ "${DEBUG}" == 1 ]; then
       export PS4='+ ${BASH_SOURCE##*/}:${LINENO} '
   set -x
 fi
 
-set -euo pipefail
 
 # Created by argbash-init v2.10.0
 # ARG_POSITIONAL_SINGLE([domain],[Domain to install Zimbra for],[])
@@ -252,7 +251,7 @@ else
     echo -e "\nZimbra is supported on server OS types only. Such as ${SUPPORTED_OS}.\nSee : https://www.zimbra.org/download/zimbra-collaboration"
     exit
 fi
-}
+}||true
 
 Check_Arch(){
 if ! uname -m | grep -q 64 ; then
@@ -478,7 +477,7 @@ fi
 Generate_Installer_Script_INPUT(){
 	##Preparing the config files to inject
 	echo "Creating the Scripts files"
-	mkdir /tmp/zcs && cd /tmp/zcs
+	mkdir -p /tmp/zcs
 	touch /tmp/zcs/installZimbraScript
 	cat >> /tmp/zcs/installZimbraScript <<- 'EOL'
 	AVDOMAIN="${DOMAIN}"
@@ -608,7 +607,7 @@ Generate_Installer_Script_INPUT(){
 INSTALL_ZIMBRA(){
 	latestLTSZimbra=$(curl -s https://wiki.zimbra.com/wiki/Zimbra_Releases | grep -E "LTS Release"|grep -oE "[[:digit:]]+.[[:digit:]]+.[[:digit:]]+"| head -n1);
 	zimbra_url=$(curl -s https://www.zimbra.org/download/zimbra-collaboration | grep "${Server_OS}" | grep  |grep ${latestLTSZimbra} |grep 64bitx86 | tail -n1|grep -Eo '(http|https)://[a-zA-Z0-9./?=_-]*.tgz'|uniq);
-	echo "Downloading Zimbra release....."
+	echo "Downloading Zimbra release ${zimbra_url}....."
 	wget "${zimbra_url}" ;
 	filename=$(basename "$zimbra_url");
 	filefolder=${filename//.tgz/};
@@ -736,8 +735,12 @@ fi
 
 Pre_Install_Required_Components
 Generate_Installer_Script_INPUT
-INSTALL_ZIMBRA
-ZIMBRA_INSTALL_COMPLETE
+
+
+if INSTALL_ZIMBRA ; then
+	ZIMBRA_INSTALL_COMPLETE
+fi
+
 
 if [[ "$_arg_zextras" = "on" ]] ; then
 	Install_Zextras
