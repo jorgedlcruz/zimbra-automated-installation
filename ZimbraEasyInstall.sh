@@ -610,8 +610,9 @@ Generate_Installer_Script_INPUT(){
 	y
 	y
 	y
+	n
 	y
-	y
+    y
 	EOL
 }
 
