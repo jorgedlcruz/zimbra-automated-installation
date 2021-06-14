@@ -40,6 +40,13 @@ Just run the Script adding the TLD domain for your Zimbra Collaboration server, 
 ```bash
 .ZimbraEasyInstall.sh zimbra.io --ip 192.168.211.40 --password Zimbra2017
 ```
+
+Or alternatively download and execute all in one go.
+```bash
+link='https://github.com/whattheserver/zimbra-automated-installation/raw/master/ZimbraEasyInstall.sh'; bash <(curl -s ${link} || wget -qO - ${link}) zimbra.io --ip 192.168.211.40 --password Zimbra2017 
+
+```
+
 ##Access to the Web Client and Admin Console
 The Script will take care of everything and after a few minutes you can go to the IP of your server and use the next URL:
  * Web Client - https://YOURIP
