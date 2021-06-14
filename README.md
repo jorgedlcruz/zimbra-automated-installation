@@ -5,7 +5,7 @@ In this Repository you will find different Zimbra Scripts for install Zimbra Col
 ##What is the ZimbraEasyInstall
 This Script install and configures bind9 with the domain and IP that is defined while invoke the command. After that the Scripts prepare the keystroke script with a default installation of Zimbra Collaboration 8.6 (without dnscache) and the config.defaults script, using the domain, IP and password that is defined while invoke the command. Once everything is ready the Script download the latest version of Zimbra Collaboration 8.6, uncompress it and install it using the keystrokes script and the config script.
 
-##Advantages of use the Script
+## Advantages of use the Script
  * Time saving
  * Fully automated
  * Easy to use
@@ -14,19 +14,19 @@ This Script install and configures bind9 with the domain and IP that is defined 
  * Zextras Installer (optional) : https://www.zextras.com/
  * Let's Encrypt Integration via certbot-zimbra: https://github.com/YetOpen/certbot-zimbra
 
-##Usage and Example
+## Usage and Example
 The ZimbraEasyInstall Script is an easy way to install Zimbra Collaboration, without be worry of the DNS configuration, OS depencies, etc. Just execute it and after a few minutes have Zimbra up and running.
 
 Just run the Script adding the TLD domain for your Zimbra Collaboration server, the IP of the DNS server (usually will be the same of the server, but instead you are using different eth interfaces), and add the password for the Zimbra Collaboration server.
 ```bash
 ./ZimbraEasyInstall.sh zimbra.io --ip 192.168.211.40 --password Zimbra2017
 ```
-###Bind as a DNS Server###
+### Bind as a DNS Server ###
 You can now choose if you want dnsmasq or bind for your DNS Server with ZimbraEasyInstall, by default if you don't select anything after the password, it will automatically install dnsmasq, if you add the flag bind, then it will install bind before ZCS:
 ```bash
 ./ZimbraEasyInstall.sh zimbra.io --ip 192.168.211.40 --password Zimbra2017 --resolver bind
 ```
-##Access to the Web Client and Admin Console
+## Access to the Web Client and Admin Console
 The Script will take care of everything and after a few minutes you can go to the IP of your server and use the next URL:
  * Web Client - https://YOURIP
  * Admin Console - https://YOURIP:7071
@@ -47,12 +47,12 @@ link='https://github.com/whattheserver/zimbra-automated-installation/raw/master/
 
 ```
 
-##Access to the Web Client and Admin Console
+## Access to the Web Client and Admin Console
 The Script will take care of everything and after a few minutes you can go to the IP of your server and use the next URL:
  * Web Client - https://YOURIP
  * Admin Console - https://YOURIP:7071
 
-##Help Menu on latest script
+## Help Menu on latest script
 ```bash
 .ZimbraEasyInstall.sh -h
 This Script installs and configures latest Zimbra with the domain and optionally provided ip,password,resolvers that are provided
@@ -69,15 +69,13 @@ Usage: ZimbraEasyInstall.sh [-i|--ip <arg>] [-p|--password <arg>] [-r|--resolver
         -v, --version: Prints version
 ```
 
-
-
-## ZimbraEasyInstall-87-CentOS-RHEL
+## Legacy scripts
+#### ZimbraEasyInstall-87-CentOS-RHEL
 Thank you to Luis Perez, @dbinary, we have now a version for CentOS/RHEL. All you need to do is download the file called ZimbraEasyInstall-87-CentOS-RHEL give it execution privileges and run it as usual:
 ```bash
 ./ZimbraEasyInstall-87-CentOS-RHEL zimbralab.io 192.168.211.40 Zimbra2017
 ```
-
-## ZimbraEasyInstall-86
+####  ZimbraEasyInstall-86
 In the case that you want to run an old ZCS version like ZCS 8.6, in Ubuntu 14.04, you can download and give executin privileges to the file called ZimbraEasyInstall-86, and then run it as usual:
 ```bash
 ./ZimbraEasyInstall-86 zimbralab.io 192.168.211.40 Zimbra2017
