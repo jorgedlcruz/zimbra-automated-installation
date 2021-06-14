@@ -3,17 +3,11 @@
 ## Objective Install Zimbra and optional extras in an easy and automated universal fashion.
 ## https://github.com/whattheserver/zimbra-automated-installation
 ## How to use.
-# ./ZimbraEasyInstall.sh domain 
-#./ZimbraEasyInstall.sh zimbra.io --ip 192.168.211.40 --password Zimbra2017 
+# ./ZimbraEasyInstall.sh domain
+#./ZimbraEasyInstall.sh zimbra.io --ip 192.168.211.40 --password Zimbra2017
 #
-## link='https://raw.githubusercontent.com/whattheserver/zimbra-automated-installation/master/ZimbraEasyInstall.sh'; bash <(curl -s ${link} || wget -qO - ${link}) zimbra.io --ip 192.168.211.40 --password Zimbra2017 
+## link='https://raw.githubusercontent.com/whattheserver/zimbra-automated-installation/master/ZimbraEasyInstall.sh'; bash <(curl -s ${link} || wget -qO - ${link}) zimbra.io --ip 192.168.211.40 --password Zimbra2017
 ##
-
-
-if [ "${DEBUG}" == 'True' ] ||[ "${DEBUG}" == 'true' ]|| [ "${DEBUG}" == 1 ]; then
-      export PS4='+ ${BASH_SOURCE##*/}:${LINENO} '
-  set -x
-fi
 
 
 # Created by argbash-init v2.10.0
@@ -21,6 +15,7 @@ fi
 # ARG_OPTIONAL_SINGLE([ip],[i],[Specify the public IPv4 address])
 # ARG_OPTIONAL_SINGLE([password],[p],[Admin password to use])
 # ARG_OPTIONAL_SINGLE([resolver],[r],[DNS Resolver to setup (optional)],[dnsmasq])
+# ARG_OPTIONAL_SINGLE([timezone],[t],[Timezone to set the server to user (optional)],[UTC])
 # ARG_OPTIONAL_BOOLEAN([upgrade],[u],[Upgrade Zimbra (and implicit default: off)])
 # ARG_OPTIONAL_BOOLEAN([zextras],[z],[Install Zextras (and implicit default: off)])
 # ARG_OPTIONAL_BOOLEAN([certbot-zimbra],[],[Install certbot-zimbra (and implicit default: off)])
@@ -46,7 +41,7 @@ die()
 
 begins_with_short_option()
 {
-	local first_option all_short_options='ipruzhv'
+	local first_option all_short_options='iprtuzhv'
 	first_option="${1:0:1}"
 	test "$all_short_options" = "${all_short_options/$first_option/}" && return 1 || return 0
 }
@@ -58,6 +53,7 @@ _arg_domain=
 _arg_ip=
 _arg_password=
 _arg_resolver="dnsmasq"
+_arg_timezone="UTC"
 _arg_upgrade="off"
 _arg_zextras="off"
 _arg_certbot_zimbra="off"
@@ -67,11 +63,12 @@ _arg_csf="off"
 print_help()
 {
 	printf '%s\n' "This Script installs and configures latest Zimbra with the domain and optionally provided ip,password,resolvers that are provided"
-	printf 'Usage: %s [-i|--ip <arg>] [-p|--password <arg>] [-r|--resolver <arg>] [-u|--(no-)upgrade] [-z|--(no-)zextras] [--(no-)certbot-zimbra] [--(no-)csf] [-h|--help] [-v|--version] <domain>\n' "$0"
+	printf 'Usage: %s [-i|--ip <arg>] [-p|--password <arg>] [-r|--resolver <arg>] [-t|--timezone <arg>] [-u|--(no-)upgrade] [-z|--(no-)zextras] [--(no-)certbot-zimbra] [--(no-)csf] [-h|--help] [-v|--version] <domain>\n' "$0"
 	printf '\t%s\n' "<domain>: Domain to install Zimbra for"
 	printf '\t%s\n' "-i, --ip: Specify the public IPv4 address (no default)"
 	printf '\t%s\n' "-p, --password: Admin password to use (no default)"
 	printf '\t%s\n' "-r, --resolver: DNS Resolver to setup (optional) (default: 'dnsmasq')"
+	printf '\t%s\n' "-t, --timezone: Timezone to set the server to user (optional) (default: 'UTC')"
 	printf '\t%s\n' "-u, --upgrade, --no-upgrade: Upgrade Zimbra (and implicit default: off) (off by default)"
 	printf '\t%s\n' "-z, --zextras, --no-zextras: Install Zextras (and implicit default: off) (off by default)"
 	printf '\t%s\n' "--certbot-zimbra, --no-certbot-zimbra: Install certbot-zimbra (and implicit default: off) (off by default)"
@@ -120,6 +117,17 @@ parse_commandline()
 				;;
 			-r*)
 				_arg_resolver="${_key##-r}"
+				;;
+			-t|--timezone)
+				test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
+				_arg_timezone="$2"
+				shift
+				;;
+			--timezone=*)
+				_arg_timezone="${_key##--timezone=}"
+				;;
+			-t*)
+				_arg_timezone="${_key##-t}"
 				;;
 			-u|--no-upgrade|--upgrade)
 				_arg_upgrade="on"
@@ -213,11 +221,12 @@ assign_positional_args 1 "${_positionals[@]}"
 
 
 # vvv  PLACE YOUR CODE HERE  vvv
-# For example:
-# printf 'Value of --%s: %s\n' 'ip' "$_arg_ip"
-# printf 'Value of --%s: %s\n' 'password' "$_arg_password"
-# printf 'Value of --%s: %s\n' 'resolver' "$_arg_resolver"
-# printf "Value of '%s': %s\\n" 'domain' "$_arg_domain"
+
+if [ "${DEBUG}" == 'True' ] || [ "${DEBUG}" == 'true' ] || [ "${DEBUG}" == 1 ]; then
+      export PS4='+ ${BASH_SOURCE##*/}:${LINENO} '
+  set -x
+fi
+
 
 ##################
 ## Preparing all the variables like IP, Hostname, etc, all of them from the container
@@ -225,7 +234,7 @@ RANDOMHAM=$(date +%s|sha256sum|base64|head -c 10)
 RANDOMSPAM=$(date +%s|sha256sum|base64|head -c 10)
 RANDOMVIRUS=$(date +%s|sha256sum|base64|head -c 10)
 HOSTNAME=$(hostname -s)
-
+TIMEZONE="$_arg_timezone"
 # IP if not provided is determined automagically...
 IP="${_arg_ip:-$(wget -qO- -t1 -T2 ipv4.icanhazip.com)}"
 DOMAIN="$_arg_domain"
@@ -460,6 +469,8 @@ if [[ "$Server_OS" = "CentOS" ]] ; then
 	elif [[ "$Server_OS_Version" = "8" ]] ; then
 		dnf install -y dnsmasq
 	fi
+else
+	DEBIAN_FRONTEND=noninteractive apt-get install -y dnsmasq
 	echo "Configuring DNS Server"
     mv /etc/dnsmasq.conf /etc/dnsmasq.conf.original
 	# Reference for indented heredocs: https://unix.stackexchange.com/a/11426/440352
@@ -479,8 +490,8 @@ Generate_Installer_Script_INPUT(){
 	echo "Creating the Scripts files"
 	mkdir -p /tmp/zcs
 	touch /tmp/zcs/installZimbraScript
-	cat >> /tmp/zcs/installZimbraScript <<- 'EOL'
-	AVDOMAIN="${DOMAIN}"
+	cat >> /tmp/zcs/installZimbraScript <<-EOL
+	AVDOMAIN="$DOMAIN"
 	AVUSER="admin@${DOMAIN}"
 	CREATEADMIN="admin@${DOMAIN}"
 	CREATEADMINPASS="${PASSWORD}"
@@ -606,7 +617,7 @@ Generate_Installer_Script_INPUT(){
 
 INSTALL_ZIMBRA(){
 	latestLTSZimbra=$(curl -s https://wiki.zimbra.com/wiki/Zimbra_Releases | grep -E "LTS Release"|grep -oE "[[:digit:]]+.[[:digit:]]+.[[:digit:]]+"| head -n1);
-	zimbra_url=$(curl -s https://www.zimbra.org/download/zimbra-collaboration | grep "${Server_OS^^}" | grep "${Server_OS_Version}" |grep ${latestLTSZimbra} |grep 64bitx86 | tail -n1|grep -Eo '(http|https)://[a-zA-Z0-9./?=_-]*.tgz'|uniq);
+	zimbra_url=$(curl -s https://www.zimbra.org/download/zimbra-collaboration | grep -i "${Server_OS}" | grep "${Server_OS_Version}" |grep ${latestLTSZimbra} |grep 64bitx86 | tail -n1|grep -Eo '(http|https)://[a-zA-Z0-9./?=_-]*.tgz'|uniq);
 	echo "Downloading Zimbra release ${zimbra_url}....."
 	wget "${zimbra_url}" ;
 	filename=$(basename "$zimbra_url");
@@ -652,7 +663,7 @@ if [[ "$Server_OS" = "CentOS" ]] ; then
 		dnf install -y bind-utils net-tools perl-libwww-perl.noarch perl-LWP-Protocol-https.noarch perl-GDGraph ipset
 	fi
 else
-  DEBIAN_FRONTEND=noninteractive apt-get install -y dnsutils libwww-perl liblwp-protocol-https-perl libgd-graph-perl net-tools ipset	
+  DEBIAN_FRONTEND=noninteractive apt-get install -y dnsutils libwww-perl liblwp-protocol-https-perl libgd-graph-perl net-tools ipset
 fi
 
 wget -O /usr/src/csf.tgz  https://download.configserver.com/csf.tgz
@@ -695,6 +706,9 @@ Install_Zextras() {
 	cd zextras_suite/ && ./install.sh all
 }
 
+SET_TIMEZONE(){
+	timedatectl set-timezone "${TIMEZONE}"
+}
 
 # todo
 Upgrade_Zimbra() {
@@ -733,9 +747,9 @@ elif [[ "$_arg_resolver" = "bind" ]] ; then
 	INSTALL_BIND
 fi
 
+SET_TIMEZONE
 Pre_Install_Required_Components
 Generate_Installer_Script_INPUT
-
 
 if INSTALL_ZIMBRA ; then
 	ZIMBRA_INSTALL_COMPLETE
