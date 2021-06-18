@@ -108,14 +108,14 @@ INSTALL_PACKAGES="zimbra-core zimbra-ldap zimbra-logger zimbra-mta zimbra-dnscac
 ```
 
 # Placeholders to use
-RANDOMHAM_PLACEHOLDER for ${RANDOMHAM}
-RANDOMSPAM_PLACEHOLDER for ${RANDOMSPAM}
-RANDOMVIRUS_PLACEHOLDER for ${RANDOMVIRUS}
-HOSTNAME_PLACEHOLDER for ${HOSTNAME}
-TIMEZONE_PLACEHOLDER for ${TIMEZONE}
-IP_PLACEHOLDER for ${IP}
-DOMAIN_PLACEHOLDER for ${DOMAIN}
-PASSWORD_PLACEHOLDER for ${PASSWORD}
+RANDOMHAM_PLACEHOLDER for ${RANDOMHAM}    
+RANDOMSPAM_PLACEHOLDER for ${RANDOMSPAM}    
+RANDOMVIRUS_PLACEHOLDER for ${RANDOMVIRUS}    
+HOSTNAME_PLACEHOLDER for ${HOSTNAME}    
+TIMEZONE_PLACEHOLDER for ${TIMEZONE}    
+IP_PLACEHOLDER for ${IP}    
+DOMAIN_PLACEHOLDER for ${DOMAIN}   
+PASSWORD_PLACEHOLDER for ${PASSWORD}    
 
 # The script will run the below on the file to splice in the values selected in the placeholder spots. So the placeholders are case sensitive.
 ```
