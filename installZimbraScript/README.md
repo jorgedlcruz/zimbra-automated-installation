@@ -107,7 +107,7 @@ zimbra_server_hostname="HOSTNAME_PLACEHOLDER"
 INSTALL_PACKAGES="zimbra-core zimbra-ldap zimbra-logger zimbra-mta zimbra-dnscache zimbra-snmp zimbra-store zimbra-apache zimbra-spell zimbra-memcached zimbra-proxy "
 ```
 
-# Placeholders to use
+#### Placeholders to use
 RANDOMHAM_PLACEHOLDER for ${RANDOMHAM}    
 RANDOMSPAM_PLACEHOLDER for ${RANDOMSPAM}    
 RANDOMVIRUS_PLACEHOLDER for ${RANDOMVIRUS}    
@@ -117,7 +117,7 @@ IP_PLACEHOLDER for ${IP}
 DOMAIN_PLACEHOLDER for ${DOMAIN}   
 PASSWORD_PLACEHOLDER for ${PASSWORD}    
 
-# The script will run the below on the file to splice in the values selected in the placeholder spots. So the placeholders are case sensitive.
+#### The script will run the below on the file to splice in the values selected in the placeholder spots. So the placeholders are case sensitive.
 ```
 sed -i -e "s|RANDOMHAM_PLACEHOLDER|${RANDOMHAM}|g" 
 sed -i -e "s|RANDOMSPAM_PLACEHOLDER|${RANDOMSPAM}|g"
@@ -151,7 +151,7 @@ Saving config in /opt/zimbra/config.23758...done.
 
 cat the file out then grep/search for your domain/hostname/IP and/or then use sed to replace.
 
-# Set placeholders
+#### Set placeholders
 ```
 config='/opt/zimbra/config.23758';
 DOMAIN='yourdomain.tld';
