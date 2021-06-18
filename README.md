@@ -56,15 +56,21 @@ The Script will take care of everything and after a few minutes you can go to th
 ```bash
 .ZimbraEasyInstall.sh -h
 This Script installs and configures latest Zimbra with the domain and optionally provided ip,password,resolvers that are provided
-Usage: ZimbraEasyInstall.sh [-i|--ip <arg>] [-p|--password <arg>] [-r|--resolver <arg>] [-u|--(no-)upgrade] [-z|--(no-)zextras] [--(no-)certbot-zimbra] [--(no-)csf] [-h|--help] [-v|--version] <domain>
+Usage: ZimbraEasyInstall.sh [-i|--ip <arg>] [-p|--password <arg>] [-r|--resolver <arg>] [-e|--edition <arg>] [-t|--timezone <arg>] [--keystrokes <arg>] [--zimbrascript <arg>] [-u|--(no-)upgrade] [-z|--(no-)zextras] [--(no-)certbot-zimbra] [--(no-)interactive] [--(no-)csf] [--(no-)debug] [-h|--help] [-v|--version] <domain>
         <domain>: Domain to install Zimbra for
         -i, --ip: Specify the public IPv4 address (no default)
         -p, --password: Admin password to use (no default)
         -r, --resolver: DNS Resolver to setup (optional) (default: 'dnsmasq')
+        -e, --edition: Zimbra edition to install 'network' or 'ose' Open Source Edition (optional) (default: 'ose')
+        -t, --timezone: Timezone to set the server to user (optional) (default: 'UTC')
+        --keystrokes: Custom Keystrokes file to use for Zimbra Installer (optional) (no default)
+        --zimbrascript: Custom installZimbraScript file to use for Zimbra Installer (optional) (no default)
         -u, --upgrade, --no-upgrade: Upgrade Zimbra (and implicit default: off) (off by default)
         -z, --zextras, --no-zextras: Install Zextras (and implicit default: off) (off by default)
         --certbot-zimbra, --no-certbot-zimbra: Install certbot-zimbra (and implicit default: off) (off by default)
+        --interactive, --no-interactive: Interactive mode walk through just the installations settings part interactively (and implicit default: off) (off by default)
         --csf, --no-csf: Install CSF Firewall (and implicit default: off) (off by default)
+        --debug, --no-debug: Run Installer with bash debugging enabled (and implicit default: off) (off by default)
         -h, --help: Prints help
         -v, --version: Prints version
 ```
