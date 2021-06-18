@@ -3,7 +3,7 @@ In this Repository you will find different Zimbra Scripts for install Zimbra Col
 
 # ZimbraEasyInstall
 ##What is the ZimbraEasyInstall
-This Script install and configures bind9 with the domain and IP that is defined while invoke the command. After that the Scripts prepare the keystroke script with a default installation of Zimbra Collaboration 8.6 (without dnscache) and the config.defaults script, using the domain, IP and password that is defined while invoke the command. Once everything is ready the Script download the latest version of Zimbra Collaboration 8.6, uncompress it and install it using the keystrokes script and the config script.
+This Script install and configures bind9 with the domain and IP that is defined while invoke the command. After that the Scripts prepare the keystroke script with a default installation of Zimbra Collaboration 8.8.x (without dnscache) and the config.defaults script, using the domain, IP and password that is defined while invoke the command. Once everything is ready the Script download the latest version of Zimbra Collaboration 8.8.x/9.0.0(Network ONLY), uncompress it and install it using the keystrokes script and the config script.
 
 ## Advantages of use the Script
  * Time saving
@@ -83,11 +83,7 @@ In the case that you want to run an old ZCS version like ZCS 8.6, in Ubuntu 14.0
 
 ## ToDo
 - [ ] Prepare and configure automatically the Reverse DNS Zone
-- [X] Make it multi-platform to use it in CentOS/RedHat, Suse and Ubuntu 12.04
-- - [x] CentOS/RedHat/Oracle/AlmaLinux/Rocky 6,7,8
-- [ ] Make it Multi-Server, to install in each server only the rol that selects (LDAP, Mailbox, MTA, PROXY, UI)
-- [x] Have the option to select Bind, dnsmasq, or external DNS
-- [ ] Have the option to select the Timezone, the default one is Los Angeles
+- [ ] Make it Multi-Server, to install in each server only the role that selects (LDAP, Mailbox, MTA, PROXY, UI)
 
 ## Distributed under MIT license
 Copyright (c) 2017 Jorge de la Cruz
