@@ -3,7 +3,7 @@ In this Repository you will find different Zimbra Scripts for install Zimbra Col
 
 # ZimbraEasyInstall
 ##What is the ZimbraEasyInstall
-This Script install and configures bind9 with the domain and IP that is defined while invoke the command. After that the Scripts prepare the keystroke script with a default installation of Zimbra Collaboration 8.6 (without dnscache) and the config.defaults script, using the domain, IP and password that is defined while invoke the command. Once everything is ready the Script download the latest version of Zimbra Collaboration 8.6, uncompress it and install it using the keystrokes script and the config script.
+This Script install and configures bind9 with the domain and IP that is defined while invoke the command. After that the Scripts prepare the keystroke script with a default installation of Zimbra Collaboration 8.8.x (without dnscache) and the config.defaults script, using the domain, IP and password that is defined while invoke the command. Once everything is ready the Script download the latest version of Zimbra Collaboration 8.8.x/9.0.0(Network ONLY), uncompress it and install it using the keystrokes script and the config script.
 
 ## Advantages of use the Script
  * Time saving
@@ -56,15 +56,21 @@ The Script will take care of everything and after a few minutes you can go to th
 ```bash
 .ZimbraEasyInstall.sh -h
 This Script installs and configures latest Zimbra with the domain and optionally provided ip,password,resolvers that are provided
-Usage: ZimbraEasyInstall.sh [-i|--ip <arg>] [-p|--password <arg>] [-r|--resolver <arg>] [-u|--(no-)upgrade] [-z|--(no-)zextras] [--(no-)certbot-zimbra] [--(no-)csf] [-h|--help] [-v|--version] <domain>
+Usage: ZimbraEasyInstall.sh [-i|--ip <arg>] [-p|--password <arg>] [-r|--resolver <arg>] [-e|--edition <arg>] [-t|--timezone <arg>] [--keystrokes <arg>] [--zimbrascript <arg>] [-u|--(no-)upgrade] [-z|--(no-)zextras] [--(no-)certbot-zimbra] [--(no-)interactive] [--(no-)csf] [--(no-)debug] [-h|--help] [-v|--version] <domain>
         <domain>: Domain to install Zimbra for
         -i, --ip: Specify the public IPv4 address (no default)
         -p, --password: Admin password to use (no default)
         -r, --resolver: DNS Resolver to setup (optional) (default: 'dnsmasq')
+        -e, --edition: Zimbra edition to install 'network' or 'ose' Open Source Edition (optional) (default: 'ose')
+        -t, --timezone: Timezone to set the server to user (optional) (default: 'UTC')
+        --keystrokes: Custom Keystrokes file to use for Zimbra Installer (optional) (no default)
+        --zimbrascript: Custom installZimbraScript file to use for Zimbra Installer (optional) (no default)
         -u, --upgrade, --no-upgrade: Upgrade Zimbra (and implicit default: off) (off by default)
         -z, --zextras, --no-zextras: Install Zextras (and implicit default: off) (off by default)
         --certbot-zimbra, --no-certbot-zimbra: Install certbot-zimbra (and implicit default: off) (off by default)
+        --interactive, --no-interactive: Interactive mode walk through just the installations settings part interactively (and implicit default: off) (off by default)
         --csf, --no-csf: Install CSF Firewall (and implicit default: off) (off by default)
+        --debug, --no-debug: Run Installer with bash debugging enabled (and implicit default: off) (off by default)
         -h, --help: Prints help
         -v, --version: Prints version
 ```
@@ -83,11 +89,7 @@ In the case that you want to run an old ZCS version like ZCS 8.6, in Ubuntu 14.0
 
 ## ToDo
 - [ ] Prepare and configure automatically the Reverse DNS Zone
-- [X] Make it multi-platform to use it in CentOS/RedHat, Suse and Ubuntu 12.04
-- - [x] CentOS/RedHat/Oracle/AlmaLinux/Rocky 6,7,8
-- [ ] Make it Multi-Server, to install in each server only the rol that selects (LDAP, Mailbox, MTA, PROXY, UI)
-- [x] Have the option to select Bind, dnsmasq, or external DNS
-- [ ] Have the option to select the Timezone, the default one is Los Angeles
+- [ ] Make it Multi-Server, to install in each server only the role that selects (LDAP, Mailbox, MTA, PROXY, UI)
 
 ## Distributed under MIT license
 Copyright (c) 2017 Jorge de la Cruz
