@@ -591,7 +591,7 @@ Generate_Installer_Script_INPUT(){
 
 INSTALL_ZIMBRA(){
 	latestLTSZimbra=$(curl -s https://wiki.zimbra.com/wiki/Zimbra_Releases | grep -E "LTS Release"|grep -oE "[[:digit:]]+.[[:digit:]]+.[[:digit:]]+"| head -n1);
-	zimbra_url=$(curl -s ${zimbra_downloads_page} | grep -i "${Server_OS}" | grep "${Server_OS_Version}" |grep "${latestLTSZimbra}" |grep 64bit x86 | tail -n1|grep -Eo '(http|https)://[a-zA-Z0-9./?=_-]*.tgz'|uniq);
+	zimbra_url=$(curl -s ${zimbra_downloads_page} | grep -i "${Server_OS}" | grep "${Server_OS_Version}" |grep "${latestLTSZimbra}" |grep "64bit x86" | tail -n1|grep -Eo '(http|https)://[a-zA-Z0-9./?=_-]*.tgz'|uniq);
 	echo "Downloading Zimbra release ${zimbra_url}....."
 	wget "${zimbra_url}" ;
 	filename=$(basename "$zimbra_url");
